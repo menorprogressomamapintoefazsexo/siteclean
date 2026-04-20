@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth - Dashboard</title>
+  <style>
+    :root {
+      --bg-primary: #000000;
+      --bg-secondary: #0a0a0a;
+      --bg-tertiary: #111111;
+      --border-color: #333333;
+      --text-primary: #ededed;
+      --text-secondary: #888888;
+      --accent: #ffffff;
+      --accent-hover: #cccccc;
+      --danger: #b91c1c;
+      --success: #059669;
+      --warning: #d97706;
+      --info: #2563eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .fade-out { animation: fadeOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    
+    /* LOGIN */
+    .login-container {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+    }
+    
+    .login-box {
+      width: 380px;
+      background: var(--bg-secondary);
+      padding: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    .login-box h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+    
+    /* DASHBOARD */
+    .dashboard {
+      display: none;
+      min-height: 100vh;
+      background: var(--bg-primary);
+    }
+    
+    .header {
+      background: var(--bg-primary); /* Transparent/same as body for cleaner look */
+      border-bottom: 1px solid var(--border-color);
+      padding: 24px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.8);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .header-right span {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    
+    /* FORM */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+    }
+    
+    /* BUTTONS */
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.3px;
+    }
+    
+    .btn:active {
+      transform: scale(0.98);
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      width: 100%;
+      font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn-danger {
+      background: rgba(185, 28, 28, 0.1);
+      color: #fca5a5;
+      border: 1px solid rgba(185, 28, 28, 0.2);
+    }
+    
+    .btn-danger:hover {
+      background: rgba(185, 28, 28, 0.2);
+      color: #fecaca;
+    }
+    
+    .btn-success {
+      background: var(--accent);
+      color: #000;
+    }
+    
+    .btn-success:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn-warning {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-warning:hover {
+      border-color: var(--text-secondary);
+    }
+    
+    .btn-info {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-info:hover {
+      border-color: var(--text-secondary);
+    }
+    
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 11px;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+    }
+    
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-radius: 6px;
+    }
+    
+    .tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+    
+    .tab.active {
+      color: var(--accent);
+      background: var(--bg-tertiary);
+    }
+    
+    .panel {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+    
+    .panel.active {
+      display: block;
+    }
+    
+    /* CARDS */
+    .card {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 20px 24px;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    
+    .card-body {
+      padding: 24px;
+    }
+    
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 24px;
+      transition: all 0.2s;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--text-secondary);
+      transform: translateY(-2px);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .stat-value {
+      color: var(--text-primary);
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    
+    .stat-value::before {
+      content: 'R$ ';
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-right: 4px;
+    }
+    
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      color: var(--text-secondary);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    
+    tbody td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    
+    tbody tr:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    /* BADGES */
+    .badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+    
+    .badge-member { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-color: rgba(59, 130, 246, 0.2); }
+    .badge-owner { background: rgba(239, 68, 68, 0.1); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
+    .badge-developer { background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16, 185, 129, 0.2); }
+    .badge-friends { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245, 158, 11, 0.2); }
+    
+    .status-online { color: #34d399; font-weight: 600; }
+    .status-offline { color: var(--text-secondary); }
+    
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-content {
+      background: var(--bg-secondary);
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-content h2 {
+      margin-bottom: 24px;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    
+    .modal-actions .btn {
+      flex: 1;
+    }
+    
+    /* FORM GRID */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    
+    .price-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+    
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 13px;
+      text-transform: none;
+    }
+    
+    .error {
+      color: #ef4444;
+      margin-top: 12px;
+      font-size: 12px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    
+    small {
+      color: var(--text-secondary);
+      font-size: 11px;
+    }
+    
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div class="login-container" id="loginPage">
+    <div class="login-box">
+      <h1>Auth</h1>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Login</label>
+          <input type="text" id="loginUsername" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="loginPassword" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+        <p class="error" id="loginError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <div class="header">
+      <div class="header-content">
+        <h1>Auth Dashboard</h1>
+        <div class="header-right">
+          <span id="adminName"></span>
+          <button class="btn btn-danger btn-sm" onclick="logout()">Sair</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="showPanel('users')">👥 Usuários</button>
+        <button class="tab" onclick="showPanel('products')">📦 Produtos</button>
+        <button class="tab" onclick="showPanel('money')">💰 Dinheiro</button>
+      </div>
+
+      <!-- Panel: Usuários -->
+      <div class="panel active" id="usersPanel">
+        <div class="card">
+          <div class="card-header">
+            <h2>Gerenciar Usuários</h2>
+            <button class="btn btn-success btn-sm" onclick="openAddUserModal()">+ Adicionar</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Login</th>
+                  <th>Produto</th>
+                  <th>Role</th>
+                  <th>Expira</th>
+                  <th>Logins</th>
+                  <th>IP</th>
+                  <th>Status</th>
+                  <th>HWID</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="usersTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Produtos -->
+      <div class="panel" id="productsPanel">
+        <div class="card">
+          <div class="card-header">
+            <h2>Gerenciar Produtos</h2>
+            <button class="btn btn-success btn-sm" onclick="openAddProductModal()">+ Criar Produto</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Versão</th>
+                  <th>Criado em</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="productsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Dinheiro -->
+      <div class="panel" id="moneyPanel">
+        <!-- Estatísticas de Receita -->
+        <div class="stats-grid" id="statsGrid" style="margin-bottom: 32px;">
+          <div class="stat-card">
+            <div class="stat-label">Receita Semanal</div>
+            <div class="stat-value" id="statWeekly">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Receita Mensal</div>
+            <div class="stat-value" id="statMonthly">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Receita Trimestral</div>
+            <div class="stat-value" id="statQuarterly">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Receita Anual</div>
+            <div class="stat-value" id="statYearly">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Receita Total</div>
+            <div class="stat-value" id="statLifetime">0</div>
+          </div>
+        </div>
+
+        <!-- Preços dos Produtos -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <h2>💰 Preços dos Produtos</h2>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Semanal</th>
+                  <th>Mensal</th>
+                  <th>Trimestral</th>
+                  <th>Anual</th>
+                  <th>Lifetime</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="pricesTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Vendas -->
+        <div class="card">
+          <div class="card-header">
+            <h2>📊 Histórico de Vendas</h2>
+            <button class="btn btn-success btn-sm" onclick="openAddSaleModal()">+ Nova Venda</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Produto</th>
+                  <th>Usuário</th>
+                  <th>Período</th>
+                  <th>Valor</th>
+                  <th>Conta</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="salesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Usuário -->
+  <div class="modal" id="addUserModal">
+    <div class="modal-content">
+      <h2>Adicionar Usuário</h2>
+      <form id="addUserForm">
+        <div class="form-group">
+          <label>Login</label>
+          <input type="text" id="newUserLogin" required>
+        </div>
+        <div class="form-group">
+          <label>Senha (opcional)</label>
+          <input type="text" id="newUserPassword">
+        </div>
+        <div class="form-group">
+          <label>Produto</label>
+          <select id="newUserProduct" required></select>
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="newUserRole">
+            <option value="Member">Member</option>
+            <option value="Owner">Owner</option>
+            <option value="Developer">Developer</option>
+            <option value="Friends">Friends</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tempo</label>
+          <select id="newUserExpiry" required>
+            <option value="7">1 semana</option>
+            <option value="30">30 dias</option>
+            <option value="90">90 dias (trimestral)</option>
+            <option value="365">1 ano</option>
+            <option value="36500">Lifetime</option>
+            <option value="custom">Custom (escolher data)</option>
+          </select>
+        </div>
+        <div class="form-group" id="newUserCustomDateGroup" style="display: none;">
+          <label>Data de Expiração</label>
+          <input type="date" id="newUserCustomDate">
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="newUserRegisterSale" checked>
+          <label for="newUserRegisterSale">Registrar venda e contar nas estatísticas</label>
+        </div>
+        <div id="newUserPricePreview" style="padding: 12px; background: var(--bg-secondary); border-radius: 8px; margin-top: 8px; display: none;">
+          <small style="color: var(--text-secondary);">Preço que será registrado: <strong style="color: var(--accent);" id="newUserPriceValue">R$ 0,00</strong></small>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-success">Adicionar</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('addUserModal')">Cancelar</button>
+        </div>
+        <p class="error" id="addUserError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Usuário -->
+  <div class="modal" id="editUserModal">
+    <div class="modal-content">
+      <h2>Editar Usuário</h2>
+      <form id="editUserForm">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label>Login</label>
+          <input type="text" id="editUserLogin" required>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="text" id="editUserPassword">
+        </div>
+        <div class="form-group">
+          <label>Produto</label>
+          <select id="editUserProduct" required></select>
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="editUserRole">
+            <option value="Member">Member</option>
+            <option value="Owner">Owner</option>
+            <option value="Developer">Developer</option>
+            <option value="Friends">Friends</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Renovar Licença</label>
+          <select id="editUserExpiry">
+            <option value="">Manter atual</option>
+            <option value="7">1 semana</option>
+            <option value="30">30 dias</option>
+            <option value="90">90 dias (trimestral)</option>
+            <option value="365">1 ano</option>
+            <option value="36500">Lifetime</option>
+            <option value="custom">Custom (escolher data)</option>
+          </select>
+        </div>
+        <div class="form-group" id="editUserCustomDateGroup" style="display: none;">
+          <label>Data de Expiração</label>
+          <input type="date" id="editUserCustomDate">
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="editResetHwid">
+          <label for="editResetHwid">Resetar HWID</label>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-warning">Salvar</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('editUserModal')">Cancelar</button>
+        </div>
+        <p class="error" id="editUserError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Produto -->
+  <div class="modal" id="addProductModal">
+    <div class="modal-content">
+      <h2>Criar Produto</h2>
+      <form id="addProductForm">
+        <div class="form-group">
+          <label>Nome do Produto</label>
+          <input type="text" id="newProductName" required>
+        </div>
+        <div class="form-group">
+          <label>Versão</label>
+          <input type="text" id="newProductVersion" value="1.0.0" placeholder="1.0.0" required>
+          <small style="color: var(--text-secondary); font-size: 12px;">Versão requerida do cliente para este produto</small>
+        </div>
+        <div class="price-inputs">
+          <div class="price-input">
+            <label>Semanal (R$)</label>
+            <input type="number" id="newProductWeekly" step="0.01" min="0" value="0">
+          </div>
+          <div class="price-input">
+            <label>Mensal (R$)</label>
+            <input type="number" id="newProductMonthly" step="0.01" min="0" value="0">
+          </div>
+          <div class="price-input">
+            <label>Trimestral (R$)</label>
+            <input type="number" id="newProductQuarterly" step="0.01" min="0" value="0">
+          </div>
+          <div class="price-input">
+            <label>Anual (R$)</label>
+            <input type="number" id="newProductYearly" step="0.01" min="0" value="0">
+          </div>
+          <div class="price-input">
+            <label>Lifetime (R$)</label>
+            <input type="number" id="newProductLifetime" step="0.01" min="0" value="0">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-success">Criar</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('addProductModal')">Cancelar</button>
+        </div>
+        <p class="error" id="addProductError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Versão -->
+  <div class="modal" id="editVersionModal">
+    <div class="modal-content">
+      <h2>Editar Versão do Produto</h2>
+      <form id="editVersionForm">
+        <input type="hidden" id="editVersionProductId">
+        <div class="form-group">
+          <label>Nome do Produto</label>
+          <input type="text" id="editVersionProductName" readonly style="background: var(--bg-secondary); opacity: 0.7;">
+        </div>
+        <div class="form-group">
+          <label>Versão Atual</label>
+          <input type="text" id="editVersionCurrent" readonly style="background: var(--bg-secondary); opacity: 0.7;">
+        </div>
+        <div class="form-group">
+          <label>Nova Versão</label>
+          <input type="text" id="editVersionNew" placeholder="1.0.0" required>
+          <small style="color: var(--text-secondary); font-size: 12px;">Versão requerida do cliente para este produto</small>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-warning">Atualizar Versão</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('editVersionModal')">Cancelar</button>
+        </div>
+        <p class="error" id="editVersionError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Preços -->
+  <div class="modal" id="editPricesModal">
+    <div class="modal-content">
+      <h2>Editar Preços</h2>
+      <form id="editPricesForm">
+        <input type="hidden" id="editProductId">
+        <div class="price-inputs">
+          <div class="price-input">
+            <label>Semanal (R$)</label>
+            <input type="number" id="editProductWeekly" step="0.01" min="0">
+          </div>
+          <div class="price-input">
+            <label>Mensal (R$)</label>
+            <input type="number" id="editProductMonthly" step="0.01" min="0">
+          </div>
+          <div class="price-input">
+            <label>Trimestral (R$)</label>
+            <input type="number" id="editProductQuarterly" step="0.01" min="0">
+          </div>
+          <div class="price-input">
+            <label>Anual (R$)</label>
+            <input type="number" id="editProductYearly" step="0.01" min="0">
+          </div>
+          <div class="price-input">
+            <label>Lifetime (R$)</label>
+            <input type="number" id="editProductLifetime" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-warning">Salvar</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('editPricesModal')">Cancelar</button>
+        </div>
+        <p class="error" id="editPricesError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Venda -->
+  <div class="modal" id="addSaleModal">
+    <div class="modal-content">
+      <h2>Registrar Venda</h2>
+      <form id="addSaleForm">
+        <div class="form-group">
+          <label>Produto</label>
+          <select id="saleProduct" required></select>
+        </div>
+        <div class="form-group">
+          <label>Login do Usuário</label>
+          <input type="text" id="saleUserLogin" required>
+        </div>
+        <div class="form-group">
+          <label>Período</label>
+          <select id="salePeriod" required>
+            <option value="weekly">Semanal</option>
+            <option value="monthly">Mensal</option>
+            <option value="quarterly">Trimestral</option>
+            <option value="yearly">Anual</option>
+            <option value="lifetime">Lifetime</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="salePrice" step="0.01" min="0" required>
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="saleCountInStats" checked>
+          <label for="saleCountInStats">Contar nas estatísticas (desmarque para amigos)</label>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-success">Registrar</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('addSaleModal')">Cancelar</button>
+        </div>
+        <p class="error" id="addSaleError"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+// Localize esta linha no final do seu HTML e altere para:
+const API = 'http://167.114.48.162:3000';
+    let token = localStorage.getItem('token');
+    let products = [];
+
+    if (token) showDashboard();
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        const res = await fetch(`${API}/api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          token = data.token;
+          localStorage.setItem('token', token);
+          document.getElementById('adminName').textContent = data.username;
+          showDashboard();
+        } else {
+          document.getElementById('loginError').textContent = data.error;
+        }
+      } catch (err) {
+        document.getElementById('loginError').textContent = 'Erro de conexão';
+      }
+    });
+
+    function showDashboard() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadProducts();
+      loadUsers();
+      loadSales();
+      loadStats();
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      location.reload();
+    }
+
+    function showPanel(panel) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(panel + 'Panel').classList.add('active');
+      event.target.classList.add('active');
+      
+      // Recarregar dados quando mudar para aba Dinheiro
+      if (panel === 'money') {
+        loadProducts(); // Atualiza preços
+        loadSales();
+        loadStats();
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function authHeaders() {
+      return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    function formatCurrency(value) {
+      return value.toFixed(2).replace('.', ',');
+    }
+
+    // Estatísticas
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API}/api/stats/revenue`, { headers: authHeaders() });
+        const stats = await res.json();
+        
+        document.getElementById('statWeekly').textContent = formatCurrency(stats.weekly);
+        document.getElementById('statMonthly').textContent = formatCurrency(stats.monthly);
+        document.getElementById('statQuarterly').textContent = formatCurrency(stats.quarterly);
+        document.getElementById('statYearly').textContent = formatCurrency(stats.yearly);
+        document.getElementById('statLifetime').textContent = formatCurrency(stats.lifetime);
+      } catch (err) {
+        console.error('Erro ao carregar estatísticas:', err);
+      }
+    }
+
+    // Produtos
+    async function loadProducts() {
+      try {
+        const res = await fetch(`${API}/api/products`, { headers: authHeaders() });
+        products = await res.json();
+        
+        // Tabela de produtos (sem preços)
+        document.getElementById('productsTable').innerHTML = products.length === 0 
+          ? '<tr><td colspan="4" class="empty-state">Nenhum produto cadastrado</td></tr>'
+          : products.map(p => `
+            <tr>
+              <td><strong>${p.name}</strong></td>
+              <td><span style="background: var(--accent); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">${p.version || '1.0.0'}</span></td>
+              <td>${new Date(p.createdAt).toLocaleDateString('pt-BR')}</td>
+              <td class="actions">
+                <button class="btn btn-warning btn-sm" onclick="editVersion('${p._id}')">Versão</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p._id}')">Deletar</button>
+              </td>
+            </tr>
+          `).join('');
+        
+        // Tabela de preços (na aba Dinheiro)
+        document.getElementById('pricesTable').innerHTML = products.length === 0 
+          ? '<tr><td colspan="7" class="empty-state">Nenhum produto cadastrado</td></tr>'
+          : products.map(p => `
+            <tr>
+              <td><strong>${p.name}</strong></td>
+              <td>R$ ${formatCurrency(p.prices?.weekly || 0)}</td>
+              <td>R$ ${formatCurrency(p.prices?.monthly || 0)}</td>
+              <td>R$ ${formatCurrency(p.prices?.quarterly || 0)}</td>
+              <td>R$ ${formatCurrency(p.prices?.yearly || 0)}</td>
+              <td>R$ ${formatCurrency(p.prices?.lifetime || 0)}</td>
+              <td class="actions">
+                <button class="btn btn-info btn-sm" onclick="editPrices('${p._id}')">Editar Preços</button>
+              </td>
+            </tr>
+          `).join('');
+        
+        const options = products.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+        document.getElementById('newUserProduct').innerHTML = options || '<option value="">Crie um produto</option>';
+        document.getElementById('editUserProduct').innerHTML = options;
+        document.getElementById('saleProduct').innerHTML = options || '<option value="">Crie um produto</option>';
+      } catch (err) {
+        console.error('Erro ao carregar produtos:', err);
+      }
+    }
+
+    function openAddProductModal() {
+      document.getElementById('addProductForm').reset();
+      document.getElementById('addProductError').textContent = '';
+      openModal('addProductModal');
+    }
+
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const prices = {
+        weekly: parseFloat(document.getElementById('newProductWeekly').value) || 0,
+        monthly: parseFloat(document.getElementById('newProductMonthly').value) || 0,
+        quarterly: parseFloat(document.getElementById('newProductQuarterly').value) || 0,
+        yearly: parseFloat(document.getElementById('newProductYearly').value) || 0,
+        lifetime: parseFloat(document.getElementById('newProductLifetime').value) || 0
+      };
+      
+      try {
+        const res = await fetch(`${API}/api/products`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ 
+            name: document.getElementById('newProductName').value,
+            version: document.getElementById('newProductVersion').value || '1.0.0',
+            prices
+          })
+        });
+        if (res.ok) { 
+          closeModal('addProductModal'); 
+          loadProducts(); // Atualiza tanto produtos quanto preços
+        } else { 
+          const data = await res.json();
+          document.getElementById('addProductError').textContent = data.error; 
+        }
+      } catch (err) {
+        document.getElementById('addProductError').textContent = 'Erro ao criar produto';
+      }
+    });
+
+    function editPrices(id) {
+      const product = products.find(p => p._id === id);
+      if (!product) return;
+      
+      document.getElementById('editProductId').value = id;
+      document.getElementById('editProductWeekly').value = product.prices?.weekly || 0;
+      document.getElementById('editProductMonthly').value = product.prices?.monthly || 0;
+      document.getElementById('editProductQuarterly').value = product.prices?.quarterly || 0;
+      document.getElementById('editProductYearly').value = product.prices?.yearly || 0;
+      document.getElementById('editProductLifetime').value = product.prices?.lifetime || 0;
+      document.getElementById('editPricesError').textContent = '';
+      openModal('editPricesModal');
+    }
+
+    document.getElementById('editPricesForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editProductId').value;
+      const prices = {
+        weekly: parseFloat(document.getElementById('editProductWeekly').value) || 0,
+        monthly: parseFloat(document.getElementById('editProductMonthly').value) || 0,
+        quarterly: parseFloat(document.getElementById('editProductQuarterly').value) || 0,
+        yearly: parseFloat(document.getElementById('editProductYearly').value) || 0,
+        lifetime: parseFloat(document.getElementById('editProductLifetime').value) || 0
+      };
+      
+      try {
+        const res = await fetch(`${API}/api/products/${id}/prices`, {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({ prices })
+        });
+        if (res.ok) { 
+          closeModal('editPricesModal'); 
+          loadProducts(); // Atualiza tanto produtos quanto preços
+        } else { 
+          const data = await res.json();
+          document.getElementById('editPricesError').textContent = data.error; 
+        }
+      } catch (err) {
+        document.getElementById('editPricesError').textContent = 'Erro ao atualizar preços';
+      }
+    });
+
+    function editVersion(id) {
+      const product = products.find(p => p._id === id);
+      if (!product) return;
+      
+      document.getElementById('editVersionProductId').value = id;
+      document.getElementById('editVersionProductName').value = product.name;
+      document.getElementById('editVersionCurrent').value = product.version || '1.0.0';
+      document.getElementById('editVersionNew').value = product.version || '1.0.0';
+      document.getElementById('editVersionError').textContent = '';
+      openModal('editVersionModal');
+    }
+
+    document.getElementById('editVersionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editVersionProductId').value;
+      const version = document.getElementById('editVersionNew').value;
+      
+      try {
+        const res = await fetch(`${API}/api/products/${id}/version`, {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({ version })
+        });
+        if (res.ok) { 
+          closeModal('editVersionModal'); 
+          loadProducts(); 
+        } else { 
+          const data = await res.json();
+          document.getElementById('editVersionError').textContent = data.error; 
+        }
+      } catch (err) {
+        document.getElementById('editVersionError').textContent = 'Erro ao atualizar versão';
+      }
+    });
+
+    async function deleteProduct(id) {
+      if (!confirm('Deletar produto?')) return;
+      try {
+        await fetch(`${API}/api/products/${id}`, { method: 'DELETE', headers: authHeaders() });
+        loadProducts();
+      } catch (err) {
+        alert('Erro ao deletar produto');
+      }
+    }
+
+    // Usuários
+    async function loadUsers() {
+      try {
+        const res = await fetch(`${API}/api/users`, { headers: authHeaders() });
+        const users = await res.json();
+        
+        document.getElementById('usersTable').innerHTML = users.length === 0
+          ? '<tr><td colspan="9" class="empty-state">Nenhum usuário cadastrado</td></tr>'
+          : users.map(u => {
+            const expiry = new Date(u.expiryDate);
+            const daysLeft = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
+            const expiryStr = daysLeft > 365 ? 'Lifetime' : expiry.toLocaleDateString('pt-BR');
+            const expired = daysLeft < 0;
+            const roleClass = `badge-${u.role.toLowerCase()}`;
+            
+            return `
+              <tr>
+                <td><strong>${u.login}</strong></td>
+                <td>${u.product}</td>
+                <td><span class="badge ${roleClass}">${u.role}</span></td>
+                <td style="color:${expired ? 'var(--danger)' : 'var(--success)'}">${expiryStr}</td>
+                <td>${u.loginCount}</td>
+                <td>${u.lastIP || '-'}</td>
+                <td class="${u.isOnline ? 'status-online' : 'status-offline'}">${u.isOnline ? '● Online' : '○ Offline'}</td>
+                <td style="font-family: monospace; font-size: 12px; color: ${u.hwid ? 'var(--text-primary)' : 'var(--text-secondary)'}">${u.hwid || 'Não registrado'}</td>
+                <td class="actions">
+                  <button class="btn btn-warning btn-sm" onclick='editUser(${JSON.stringify(u).replace(/'/g, "&#39;")})'>Editar</button>
+                  <button class="btn btn-info btn-sm" onclick="resetHwid('${u._id}')">HWID</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteUser('${u._id}')">X</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+      } catch (err) {
+        console.error('Erro ao carregar usuários:', err);
+      }
+    }
+
+    // Função para mapear dias para período
+    function getPeriodFromDays(days) {
+      const daysNum = parseInt(days);
+      if (daysNum === 7) return 'weekly';
+      if (daysNum === 30) return 'monthly';
+      if (daysNum === 90) return 'quarterly';
+      if (daysNum === 365) return 'yearly';
+      if (daysNum === 36500) return 'lifetime';
+      return 'monthly'; // padrão
+    }
+
+    function openAddUserModal() {
+      if (products.length === 0) { alert('Crie um produto primeiro'); return; }
+      document.getElementById('addUserForm').reset();
+      document.getElementById('newUserRegisterSale').checked = true;
+      document.getElementById('addUserError').textContent = '';
+      updateUserPricePreview();
+      openModal('addUserModal');
+    }
+
+    // Atualizar preview de preço ao criar usuário
+    function updateUserPricePreview() {
+      const productName = document.getElementById('newUserProduct').value;
+      const expiryDays = document.getElementById('newUserExpiry').value;
+      const registerSale = document.getElementById('newUserRegisterSale').checked;
+      const previewDiv = document.getElementById('newUserPricePreview');
+      const priceValue = document.getElementById('newUserPriceValue');
+      
+      // Não mostrar preview para planos custom
+      if (expiryDays === 'custom') {
+        previewDiv.style.display = 'none';
+        return;
+      }
+      
+      if (registerSale && productName) {
+        const product = products.find(p => p.name === productName);
+        if (product && product.prices) {
+          const period = getPeriodFromDays(expiryDays);
+          const price = product.prices[period] || 0;
+          priceValue.textContent = `R$ ${formatCurrency(price)}`;
+          previewDiv.style.display = 'block';
+        } else {
+          previewDiv.style.display = 'none';
+        }
+      } else {
+        previewDiv.style.display = 'none';
+      }
+    }
+
+    // Event listeners para preview de preço
+    document.getElementById('newUserProduct').addEventListener('change', updateUserPricePreview);
+    document.getElementById('newUserExpiry').addEventListener('change', function() {
+      updateUserPricePreview();
+      toggleCustomDateField('newUserExpiry', 'newUserCustomDateGroup', 'newUserCustomDate');
+    });
+    document.getElementById('newUserRegisterSale').addEventListener('change', updateUserPricePreview);
+
+    // Event listener para editar usuário
+    document.getElementById('editUserExpiry').addEventListener('change', function() {
+      toggleCustomDateField('editUserExpiry', 'editUserCustomDateGroup', 'editUserCustomDate');
+    });
+
+    // Função para mostrar/ocultar campo de data custom
+    function toggleCustomDateField(selectId, groupId, dateInputId) {
+      const select = document.getElementById(selectId);
+      const group = document.getElementById(groupId);
+      const dateInput = document.getElementById(dateInputId);
+      
+      if (select.value === 'custom') {
+        group.style.display = 'block';
+        dateInput.required = true;
+        // Define data mínima como amanhã
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.min = tomorrow.toISOString().split('T')[0];
+      } else {
+        group.style.display = 'none';
+        dateInput.required = false;
+        dateInput.value = '';
+      }
+    }
+
+    document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const login = document.getElementById('newUserLogin').value;
+      const password = document.getElementById('newUserPassword').value;
+      const productName = document.getElementById('newUserProduct').value;
+      const role = document.getElementById('newUserRole').value;
+      const expiryDays = document.getElementById('newUserExpiry').value;
+      const registerSale = document.getElementById('newUserRegisterSale').checked;
+      
+      const data = {
+        login,
+        password,
+        product: productName,
+        role
+      };
+      
+      // Se for custom, enviar data personalizada
+      if (expiryDays === 'custom') {
+        const customDate = document.getElementById('newUserCustomDate').value;
+        if (!customDate) {
+          document.getElementById('addUserError').textContent = 'Selecione uma data de expiração';
+          return;
+        }
+        data.customExpiryDate = customDate;
+      } else {
+        data.expiryDays = expiryDays;
+      }
+      
+      try {
+        // Criar usuário
+        const res = await fetch(`${API}/api/users`, { 
+          method: 'POST', 
+          headers: authHeaders(), 
+          body: JSON.stringify(data) 
+        });
+        
+        if (res.ok) {
+          // Se marcado para registrar venda, criar a venda automaticamente
+          if (registerSale && expiryDays !== 'custom') {
+            const product = products.find(p => p.name === productName);
+            if (product && product.prices) {
+              const period = getPeriodFromDays(expiryDays);
+              const price = product.prices[period] || 0;
+              
+              if (price > 0) {
+                try {
+                  await fetch(`${API}/api/sales`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                      product: productName,
+                      userLogin: login,
+                      period: period,
+                      price: price,
+                      countInStats: true
+                    })
+                  });
+                } catch (saleErr) {
+                  console.error('Erro ao registrar venda:', saleErr);
+                  // Não falha a criação do usuário se a venda falhar
+                }
+              }
+            }
+          }
+          
+          closeModal('addUserModal'); 
+          loadUsers();
+          loadSales();
+          loadStats();
+        } else { 
+          const errorData = await res.json();
+          document.getElementById('addUserError').textContent = errorData.error; 
+        }
+      } catch (err) {
+        document.getElementById('addUserError').textContent = 'Erro ao adicionar usuário';
+      }
+    });
+
+    function editUser(user) {
+      document.getElementById('editUserId').value = user._id;
+      document.getElementById('editUserLogin').value = user.login;
+      document.getElementById('editUserPassword').value = user.password || '';
+      document.getElementById('editUserProduct').value = user.product;
+      document.getElementById('editUserRole').value = user.role;
+      document.getElementById('editUserExpiry').value = '';
+      document.getElementById('editResetHwid').checked = false;
+      document.getElementById('editUserError').textContent = '';
+      openModal('editUserModal');
+    }
+
+    document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editUserId').value;
+      const expiryValue = document.getElementById('editUserExpiry').value;
+      
+      const data = {
+        login: document.getElementById('editUserLogin').value,
+        password: document.getElementById('editUserPassword').value,
+        product: document.getElementById('editUserProduct').value,
+        role: document.getElementById('editUserRole').value,
+        resetHwid: document.getElementById('editResetHwid').checked
+      };
+      
+      // Se for custom, enviar data personalizada
+      if (expiryValue === 'custom') {
+        const customDate = document.getElementById('editUserCustomDate').value;
+        if (!customDate) {
+          document.getElementById('editUserError').textContent = 'Selecione uma data de expiração';
+          return;
+        }
+        data.customExpiryDate = customDate;
+      } else if (expiryValue) {
+        data.expiryDays = expiryValue;
+      }
+      
+      try {
+        const res = await fetch(`${API}/api/users/${id}`, { 
+          method: 'PUT', 
+          headers: authHeaders(), 
+          body: JSON.stringify(data) 
+        });
+        if (res.ok) { 
+          closeModal('editUserModal'); 
+          loadUsers(); 
+        } else { 
+          const data = await res.json();
+          document.getElementById('editUserError').textContent = data.error; 
+        }
+      } catch (err) {
+        document.getElementById('editUserError').textContent = 'Erro ao editar usuário';
+      }
+    });
+
+    async function resetHwid(id) {
+      if (!confirm('Resetar HWID?')) return;
+      try {
+        await fetch(`${API}/api/users/${id}/reset-hwid`, { method: 'POST', headers: authHeaders() });
+        loadUsers();
+      } catch (err) {
+        alert('Erro ao resetar HWID');
+      }
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Deletar usuário?')) return;
+      try {
+        await fetch(`${API}/api/users/${id}`, { method: 'DELETE', headers: authHeaders() });
+        loadUsers();
+      } catch (err) {
+        alert('Erro ao deletar usuário');
+      }
+    }
+
+    // Vendas
+    async function loadSales() {
+      try {
+        const res = await fetch(`${API}/api/sales`, { headers: authHeaders() });
+        const sales = await res.json();
+        
+        document.getElementById('salesTable').innerHTML = sales.length === 0
+          ? '<tr><td colspan="7" class="empty-state">Nenhuma venda registrada</td></tr>'
+          : sales.map(s => {
+            const periodNames = {
+              weekly: 'Semanal',
+              monthly: 'Mensal',
+              quarterly: 'Trimestral',
+              yearly: 'Anual',
+              lifetime: 'Lifetime'
+            };
+            
+            return `
+              <tr>
+                <td>${new Date(s.createdAt).toLocaleDateString('pt-BR')}</td>
+                <td><strong>${s.product}</strong></td>
+                <td>${s.userLogin}</td>
+                <td>${periodNames[s.period]}</td>
+                <td><strong>R$ ${formatCurrency(s.price)}</strong></td>
+                <td>${s.countInStats ? '✓ Sim' : '✗ Não'}</td>
+                <td class="actions">
+                  <button class="btn btn-danger btn-sm" onclick="deleteSale('${s._id}')">X</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+      } catch (err) {
+        console.error('Erro ao carregar vendas:', err);
+      }
+    }
+
+    function openAddSaleModal() {
+      if (products.length === 0) { alert('Crie um produto primeiro'); return; }
+      document.getElementById('addSaleForm').reset();
+      document.getElementById('saleCountInStats').checked = true;
+      document.getElementById('addSaleError').textContent = '';
+      openModal('addSaleModal');
+    }
+
+    // Auto-preencher preço na modal de vendas
+    document.getElementById('saleProduct').addEventListener('change', function() {
+      updateSalePrice();
+    });
+    
+    document.getElementById('salePeriod').addEventListener('change', function() {
+      updateSalePrice();
+    });
+
+    function updateSalePrice() {
+      const productName = document.getElementById('saleProduct').value;
+      const period = document.getElementById('salePeriod').value;
+      const priceInput = document.getElementById('salePrice');
+      const product = products.find(p => p.name === productName);
+      if (product && product.prices) {
+        priceInput.value = product.prices[period] || 0;
+      }
+    }
+
+    document.getElementById('addSaleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        product: document.getElementById('saleProduct').value,
+        userLogin: document.getElementById('saleUserLogin').value,
+        period: document.getElementById('salePeriod').value,
+        price: parseFloat(document.getElementById('salePrice').value),
+        countInStats: document.getElementById('saleCountInStats').checked
+      };
+      
+      try {
+        const res = await fetch(`${API}/api/sales`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          closeModal('addSaleModal');
+          loadSales();
+          loadStats();
+        } else {
+          const data = await res.json();
+          document.getElementById('addSaleError').textContent = data.error;
+        }
+      } catch (err) {
+        document.getElementById('addSaleError').textContent = 'Erro ao registrar venda';
+      }
+    });
+
+    async function deleteSale(id) {
+      if (!confirm('Deletar venda?')) return;
+      try {
+        await fetch(`${API}/api/sales/${id}`, { method: 'DELETE', headers: authHeaders() });
+        loadSales();
+        loadStats();
+      } catch (err) {
+        alert('Erro ao deletar venda');
+      }
+    }
+
+    // Auto-atualizar
+    setInterval(() => { 
+      if (token) {
+        loadUsers();
+        loadStats();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>
