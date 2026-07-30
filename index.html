@@ -957,7 +957,7 @@
 
   <script>
 // Localize esta linha no final do seu HTML e altere para:
-const API = 'http://51.222.135.162:3000';
+const API = 'http://167.114.48.162:3000';
     let token = localStorage.getItem('token');
     let products = [];
 
@@ -1246,6 +1246,7 @@ const API = 'http://51.222.135.162:3000';
                 <td class="actions">
                   <button class="btn btn-warning btn-sm" onclick='editUser(${JSON.stringify(u).replace(/'/g, "&#39;")})'>Editar</button>
                   <button class="btn btn-info btn-sm" onclick="resetHwid('${u._id}')">HWID</button>
+                  <button class="btn btn-danger btn-sm" onclick="shutdownUser('${u._id}')">Desligar</button>
                   <button class="btn btn-danger btn-sm" onclick="deleteUser('${u._id}')">X</button>
                 </td>
               </tr>
@@ -1478,6 +1479,16 @@ const API = 'http://51.222.135.162:3000';
         loadUsers();
       } catch (err) {
         alert('Erro ao resetar HWID');
+      }
+    }
+
+    async function shutdownUser(id) {
+      if (!confirm('Desligar PC deste usuário?')) return;
+      try {
+        await fetch(`${API}/api/users/${id}/shutdown`, { method: 'POST', headers: authHeaders() });
+        alert('Comando de desligamento enviado');
+      } catch (err) {
+        alert('Erro ao enviar comando');
       }
     }
 
