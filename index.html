@@ -698,12 +698,16 @@
       <h2>Adicionar Usuário</h2>
       <form id="addUserForm">
         <div class="form-group">
-          <label>Login</label>
+          <label>Discord ID</label>
           <input type="text" id="newUserLogin" required>
         </div>
         <div class="form-group">
-          <label>Senha (opcional)</label>
-          <input type="text" id="newUserPassword">
+          <label>Nome de exibição</label>
+          <input type="text" id="newUserUsername">
+        </div>
+        <div class="form-group">
+          <label>Avatar URL</label>
+          <input type="text" id="newUserAvatar">
         </div>
         <div class="form-group">
           <label>Produto</label>
@@ -756,12 +760,16 @@
       <form id="editUserForm">
         <input type="hidden" id="editUserId">
         <div class="form-group">
-          <label>Login</label>
+          <label>Discord ID</label>
           <input type="text" id="editUserLogin" required>
         </div>
         <div class="form-group">
-          <label>Senha</label>
-          <input type="text" id="editUserPassword">
+          <label>Nome de exibição</label>
+          <input type="text" id="editUserUsername">
+        </div>
+        <div class="form-group">
+          <label>Avatar URL</label>
+          <input type="text" id="editUserAvatar">
         </div>
         <div class="form-group">
           <label>Produto</label>
@@ -1235,7 +1243,7 @@ const API = 'http://51.222.135.162:3000';
             
             return `
               <tr>
-                <td><strong>${u.login}</strong></td>
+                <td><strong>${u.username || u.login}</strong>${u.username ? `<br><small style="color:var(--text-secondary)">${u.login}</small>` : ''}</td>
                 <td>${u.product}</td>
                 <td><span class="badge ${roleClass}">${u.role}</span></td>
                 <td style="color:${expired ? 'var(--danger)' : 'var(--success)'}">${expiryStr}</td>
@@ -1342,7 +1350,8 @@ const API = 'http://51.222.135.162:3000';
     document.getElementById('addUserForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const login = document.getElementById('newUserLogin').value;
-      const password = document.getElementById('newUserPassword').value;
+      const username = document.getElementById('newUserUsername').value;
+      const avatarUrl = document.getElementById('newUserAvatar').value;
       const productName = document.getElementById('newUserProduct').value;
       const role = document.getElementById('newUserRole').value;
       const expiryDays = document.getElementById('newUserExpiry').value;
@@ -1350,7 +1359,8 @@ const API = 'http://51.222.135.162:3000';
       
       const data = {
         login,
-        password,
+        username,
+        avatarUrl,
         product: productName,
         role
       };
@@ -1420,7 +1430,8 @@ const API = 'http://51.222.135.162:3000';
     function editUser(user) {
       document.getElementById('editUserId').value = user._id;
       document.getElementById('editUserLogin').value = user.login;
-      document.getElementById('editUserPassword').value = user.password || '';
+      document.getElementById('editUserUsername').value = user.username || '';
+      document.getElementById('editUserAvatar').value = user.avatarUrl || '';
       document.getElementById('editUserProduct').value = user.product;
       document.getElementById('editUserRole').value = user.role;
       document.getElementById('editUserExpiry').value = '';
@@ -1436,7 +1447,8 @@ const API = 'http://51.222.135.162:3000';
       
       const data = {
         login: document.getElementById('editUserLogin').value,
-        password: document.getElementById('editUserPassword').value,
+        username: document.getElementById('editUserUsername').value,
+        avatarUrl: document.getElementById('editUserAvatar').value,
         product: document.getElementById('editUserProduct').value,
         role: document.getElementById('editUserRole').value,
         resetHwid: document.getElementById('editResetHwid').checked
